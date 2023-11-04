@@ -1,8 +1,7 @@
-package com.dev.userservice.services;
+package com.dev.userservice.securities;
 
 import com.dev.userservice.models.User;
 import com.dev.userservice.repositories.UserRepository;
-import org.springframework.context.annotation.Bean;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

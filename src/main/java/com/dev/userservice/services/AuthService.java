@@ -8,21 +8,16 @@ import com.dev.userservice.models.SessionStatus;
 import com.dev.userservice.models.User;
 import com.dev.userservice.repositories.SessionRepository;
 import com.dev.userservice.repositories.UserRepository;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtParserBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.MacAlgorithm;
-import org.springframework.context.annotation.Primary;
-import org.springframework.http.*;
-//import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.util.MultiValueMapAdapter;
-import org.springframework.web.bind.annotation.RestController;
-
 
 import javax.crypto.SecretKey;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -33,11 +28,11 @@ public class AuthService {
     private UserRepository userRepository;
     private SessionRepository sessionRepository;
 
-//    private BCryptPasswordEncoder bCryptPasswordEncoder;
-    public AuthService(UserRepository userRepository, SessionRepository sessionRepository){ //BCryptPasswordEncoder bCryptPasswordEncoder){
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
+    public AuthService(UserRepository userRepository, SessionRepository sessionRepository, BCryptPasswordEncoder bCryptPasswordEncoder){
         this.userRepository = userRepository;
         this.sessionRepository = sessionRepository;
-//        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
     public ResponseEntity<UserDto> signup(UserSignupRequestDto userRequestDto) throws AlreadyExistException {
         int userCount = userRepository.getUserCountByEmail(userRequestDto.getEmail());
@@ -50,7 +45,7 @@ public class AuthService {
 
         user.setName(userRequestDto.getName());
         user.setEmail(userRequestDto.getEmail());
-//        user.setPassword(bCryptPasswordEncoder.encode(userRequestDto.getPassword()));
+        user.setPassword(bCryptPasswordEncoder.encode(userRequestDto.getPassword()));
 
         userRepository.save(user);
         return new ResponseEntity<>(UserDto.from(user), HttpStatus.OK);
@@ -63,9 +58,9 @@ public class AuthService {
 //            throw new NotFoundException("Invalid user id or password");
 //        }
 
-//        if(!bCryptPasswordEncoder.matches(userLoginRequestDto.getPassword(), user.get().getPassword())){
-//            throw new RuntimeException("Invalid User Id or Password");
-//        }
+        if(!bCryptPasswordEncoder.matches(userLoginRequestDto.getPassword(), user.get().getPassword())){
+            throw new RuntimeException("Invalid User Id or Password");
+        }
 
         MacAlgorithm alg = Jwts.SIG.HS256;
         SecretKey key = alg.key().build();
