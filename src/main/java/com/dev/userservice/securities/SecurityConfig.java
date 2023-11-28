@@ -169,6 +169,7 @@ public class SecurityConfig {
                     claims.put("userId", ((Long)((User)((CustomSpringUserDetails)((UsernamePasswordAuthenticationToken)context.getPrincipal()).getPrincipal()).user).getId()).toString());
                     claims.put("emailId", (((User)((CustomSpringUserDetails)((UsernamePasswordAuthenticationToken)context.getPrincipal()).getPrincipal()).user).getEmail()));
                     claims.put("roles", roles);
+                    claims.put("role", "admin");
                 });
             }
         };
